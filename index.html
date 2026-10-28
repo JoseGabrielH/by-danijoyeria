@@ -88,7 +88,7 @@
       <div id="productos-grid" class="products-grid"></div>
     </div>
 
-    <!-- Carrusel automático debajo de Categorías de Joyas -->
+    <!-- Carrusel de 3 columnas debajo de Categorías de Joyas -->
     <div class="carousel-wrapper" aria-label="Galería destacada">
       <div class="carousel-header">
         <span class="section-subtitle">DESTACADOS EN USO</span>
@@ -96,12 +96,37 @@
         <div class="gold-divider"></div>
       </div>
 
-      <div class="carousel-container" id="carrusel-container">
-        <button type="button" class="carousel-btn prev" id="carrusel-prev" aria-label="Imagen anterior">&#10094;</button>
-        <div class="carousel-track" id="carrusel-track"></div>
-        <button type="button" class="carousel-btn next" id="carrusel-next" aria-label="Siguiente imagen">&#10095;</button>
+      <div class="carousel-stage" id="carrusel-container">
+        <button type="button" class="carousel-arrow prev" id="carrusel-prev" aria-label="Anterior">&#10094;</button>
+        <div class="carousel-trio" id="carrusel-track"></div>
+        <button type="button" class="carousel-arrow next" id="carrusel-next" aria-label="Siguiente">&#10095;</button>
       </div>
       <div class="carousel-dots" id="carrusel-dots"></div>
+    </div>
+
+    <!-- Sección de la Dueña (Imagen a la izquierda + Descripción a su lado, debajo del carrusel) -->
+    <div class="founder-section" id="nosotros">
+      <div class="founder-image-col">
+        <div class="founder-image-frame">
+          <img src="img/logo/foto-duena.jpg" alt="Dani - Fundadora de By.danijoyeria" loading="lazy">
+        </div>
+      </div>
+      <div class="founder-text-col">
+        <span class="section-subtitle">DETRÁS DE LA MARCA</span>
+        <h3>Hola, soy Dani</h3>
+        <div class="gold-divider founder-divider"></div>
+        <p>
+          Soy Dani y hoy nace oficialmente un sueño que tenía guardado en el corazón:
+          <a href="https://www.instagram.com/_by.danijoyeria/" target="_blank" rel="noopener" class="founder-ig">@_by.danijoyeria</a>.
+        </p>
+        <p>
+          Un espacio creado para ti, para esa persona que brilla con luz propia y que sabe que los detalles lo son todo.
+        </p>
+        <p>
+          Aquí encontrarás joyería en <strong>oro laminado 18K</strong>, hipoalergénica, que no se pone negra y con el brillo del oro real, pero a un precio que sí podrás darte.
+        </p>
+        <p class="founder-signature">Con amor, Dani.</p>
+      </div>
     </div>
   </section>
 

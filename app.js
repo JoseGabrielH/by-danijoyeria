@@ -171,7 +171,7 @@ function configurarEnlacesFooter() {
   });
 }
 
-// 6. Carrusel automático de imágenes debajo de Categorías de Joyas
+// 6. Carrusel de 3 imágenes visibles (Izquierda, Centro, Derecha) debajo de Categorías de Joyas
 function iniciarCarrusel() {
   const track = document.getElementById('carrusel-track');
   const dotsContainer = document.getElementById('carrusel-dots');
@@ -181,19 +181,13 @@ function iniciarCarrusel() {
 
   if (!track || !carruselData.length) return;
 
-  track.innerHTML = '';
   dotsContainer.innerHTML = '';
 
-  carruselData.forEach((item, index) => {
-    const slide = document.createElement('div');
-    slide.className = `carousel-slide ${index === 0 ? 'active' : ''}`;
-    slide.innerHTML = `<img src="${encodeURI(item.imagen)}" alt="${item.titulo || 'Joya By.danijoyeria'}" loading="lazy">`;
-    track.appendChild(slide);
-
+  carruselData.forEach((_, index) => {
     const dot = document.createElement('button');
     dot.type = 'button';
     dot.className = `carousel-dot ${index === 0 ? 'active' : ''}`;
-    dot.setAttribute('aria-label', `Ver imagen ${index + 1}`);
+    dot.setAttribute('aria-label', `Ir a imagen ${index + 1}`);
     dot.addEventListener('click', () => {
       irASlide(index);
       reiniciarTemporizadorCarrusel();
@@ -201,15 +195,36 @@ function iniciarCarrusel() {
     dotsContainer.appendChild(dot);
   });
 
-  function irASlide(nuevoIndice) {
-    const slides = track.querySelectorAll('.carousel-slide');
+  function renderizarTrio() {
+    const total = carruselData.length;
+    const idxIzq = (indiceCarrusel - 1 + total) % total;
+    const idxCentro = indiceCarrusel % total;
+    const idxDer = (indiceCarrusel + 1) % total;
+
+    const visibles = [
+      { item: carruselData[idxIzq], pos: 'is-side' },
+      { item: carruselData[idxCentro], pos: 'is-center' },
+      { item: carruselData[idxDer], pos: 'is-side' }
+    ];
+
+    track.innerHTML = visibles
+      .map(
+        v => `
+        <div class="carousel-card ${v.pos}">
+          <img src="${encodeURI(v.item.imagen)}" alt="${v.item.titulo || 'Joya By.danijoyeria'}">
+        </div>
+      `
+      )
+      .join('');
+
     const dots = dotsContainer.querySelectorAll('.carousel-dot');
-    if (!slides.length) return;
+    dots.forEach((d, idx) => d.classList.toggle('active', idx === idxCentro));
+  }
 
-    indiceCarrusel = (nuevoIndice + slides.length) % slides.length;
-
-    slides.forEach((s, idx) => s.classList.toggle('active', idx === indiceCarrusel));
-    dots.forEach((d, idx) => d.classList.toggle('active', idx === indiceCarrusel));
+  function irASlide(nuevoIndice) {
+    const total = carruselData.length;
+    indiceCarrusel = (nuevoIndice + total) % total;
+    renderizarTrio();
   }
 
   function siguienteSlide() {
@@ -235,12 +250,12 @@ function iniciarCarrusel() {
     reiniciarTemporizadorCarrusel();
   });
 
-  // Pausar mientras el usuario pasa el cursor por encima y reanudar al salir
   container.addEventListener('mouseenter', () => {
     if (intervaloCarrusel) clearInterval(intervaloCarrusel);
   });
   container.addEventListener('mouseleave', reiniciarTemporizadorCarrusel);
 
+  renderizarTrio();
   reiniciarTemporizadorCarrusel();
 }
 
