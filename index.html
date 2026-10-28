@@ -35,9 +35,13 @@
       <div class="header-actions">
         <a href="#beneficios" class="nav-extra-link">Garantía 18K</a>
         <a href="#contacto" class="nav-extra-link">Contacto</a>
-        <a href="https://www.instagram.com/_by.danijoyeria/" target="_blank" rel="noopener" class="btn-instagram" title="Síguenos en Instagram">
-          @_by.danijoyeria
+        <a href="https://www.instagram.com/__by.danijoyeria?cplk=ZDNlZDc0MzIxNw==" target="_blank" rel="noopener" class="btn-instagram" title="Síguenos en Instagram">
+          @__by.danijoyeria
         </a>
+        <button type="button" class="btn-cart-header" id="btn-abrir-carrito" aria-label="Abrir carrito de compras">
+          <span>🛍️ Carrito</span>
+          <span class="cart-badge" id="carrito-contador">0</span>
+        </button>
       </div>
     </div>
 
@@ -128,7 +132,7 @@
         <div class="gold-divider founder-divider"></div>
         <p>
           Soy Dani y hoy nace oficialmente un sueño que tenía guardado en el corazón:
-          <a href="https://www.instagram.com/_by.danijoyeria/" target="_blank" rel="noopener" class="founder-ig">@_by.danijoyeria</a>.
+          <a href="https://www.instagram.com/__by.danijoyeria?cplk=ZDNlZDc0MzIxNw==" target="_blank" rel="noopener" class="founder-ig">@__by.danijoyeria</a>.
         </p>
         <p>
           Un espacio creado para ti, para esa persona que brilla con luz propia y que sabe que los detalles lo son todo.
@@ -186,13 +190,63 @@
       <div class="footer-col">
         <h4>Síguenos</h4>
         <p>Conoce nuestras novedades y solicita asesoría:</p>
-        <a href="https://www.instagram.com/_by.danijoyeria/" target="_blank" rel="noopener" class="footer-link">📸 Instagram: @_by.danijoyeria</a>
+        <a href="https://www.instagram.com/__by.danijoyeria?cplk=ZDNlZDc0MzIxNw==" target="_blank" rel="noopener" class="footer-link">📸 Instagram: @__by.danijoyeria</a>
       </div>
     </div>
     <div class="footer-bottom">
       <p>&copy; <span id="anio"></span> By.danijoyeria. Todos los derechos reservados.</p>
     </div>
   </footer>
+
+  <!-- Modal de Ficha en Grande de la Joya -->
+  <div id="modal-joya" class="product-modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="modal-joya-titulo">
+    <div class="product-modal-card">
+      <button type="button" class="product-modal-close" id="btn-cerrar-modal" aria-label="Cerrar ficha">&times;</button>
+      <div class="product-modal-grid">
+        <div class="product-modal-img-col">
+          <span class="product-badge">Oro Laminado 18K</span>
+          <img id="modal-joya-img" src="" alt="">
+        </div>
+        <div class="product-modal-info-col">
+          <span id="modal-joya-categoria" class="product-category"></span>
+          <h3 id="modal-joya-titulo" class="modal-title"></h3>
+          <div class="gold-divider modal-divider"></div>
+          <p id="modal-joya-desc" class="modal-desc"></p>
+          <ul id="modal-joya-specs" class="product-specs modal-specs"></ul>
+          <div class="product-actions modal-actions">
+            <button type="button" id="modal-btn-carrito" class="btn-add-cart">
+              🛍️ Añadir al carrito
+            </button>
+            <a id="modal-btn-comprar" href="#" target="_blank" rel="noopener" class="btn-buy-direct">
+              💬 Comprar
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Panel Lateral del Carrito de Compras -->
+  <div id="carrito-overlay" class="cart-overlay hidden">
+    <aside class="cart-drawer" aria-label="Carrito de compras">
+      <div class="cart-header">
+        <h3>Tu Carrito de Joyas</h3>
+        <button type="button" id="btn-cerrar-carrito" class="cart-close-btn" aria-label="Cerrar carrito">&times;</button>
+      </div>
+      <div id="carrito-items" class="cart-items-list"></div>
+      <div class="cart-footer">
+        <button type="button" id="btn-enviar-pedido" class="btn-buy-direct btn-checkout-full">
+          💬 Hacer pedido de mi carrito
+        </button>
+        <button type="button" id="btn-vaciar-carrito" class="btn-clear-cart">
+          Vaciar carrito
+        </button>
+      </div>
+    </aside>
+  </div>
+
+  <!-- Notificación flotante al agregar al carrito -->
+  <div id="toast-carrito" class="cart-toast hidden">Joya añadida al carrito ✨</div>
 
   <script src="app.js"></script>
 </body>
