@@ -4,51 +4,183 @@
     "instagram": "_by.danijoyeria",
     "ciudad": "Magangué, Bolívar"
   },
+  "categorias": [
+    {
+      "id": "Pulseras",
+      "nombre": "Pulseras",
+      "imagen": "img/productos/Pulseras (4).jpg"
+    },
+    {
+      "id": "Anillos",
+      "nombre": "Anillos",
+      "imagen": "img/productos/Anillo.jpg"
+    },
+    {
+      "id": "Dijes",
+      "nombre": "Dijes",
+      "imagen": "img/productos/Dijen (4).jpg"
+    },
+    {
+      "id": "Aretes",
+      "nombre": "Aretes",
+      "imagen": "img/productos/Aretes (2).jpg"
+    },
+    {
+      "id": "Cadenas",
+      "nombre": "Cadenas",
+      "imagen": "img/productos/Cadena.jpg"
+    }
+  ],
   "productos": [
     {
-      "id": "pulsera-virgen-balines",
+      "id": "pulsera-tejida-cruz",
+      "nombre": "Pulsera Tejida Cruz 18K",
+      "categoria": "Pulseras",
+      "imagen": "img/productos/Pulseras.jpg",
+      "descripcion": "Nuestras pulseras tejidas con cruz en oro laminado 18K son más que un accesorio: son tu protección diaria. Ideales para compartir en pareja o con tu persona favorita; llévalas solas o en dúo, tú eliges el significado.",
+      "material": "Oro laminado 18K (no se oscurece)",
+      "detalle": "Tejido ajustable a cualquier muñeca con cruz central",
+      "disponibilidad": "Disponible para entrega inmediata"
+    },
+    {
+      "id": "pulsera-tejida-medalla",
       "nombre": "Pulsera Tejida Medalla & Balines",
       "categoria": "Pulseras",
-      "precio": "Consultar precio",
-      "estado": "Disponible",
-      "descripcion": "Pulsera en tejido macramé (negro o rojo) con balines diamantados y medalla en Oro Laminado 18k.",
-      "imagen": "img/productos/pulsera-medalla.jpg"
+      "imagen": "img/productos/Pulseras (4).jpg",
+      "descripcion": "Tu protección más linda, siempre contigo. ¿Ya tienes la tuya? Tejida a mano con balines dorados y medalla central en oro laminado 18K; el regalo perfecto con propósito.",
+      "material": "Oro laminado 18K (no se oscurece)",
+      "detalle": "Tejido ajustable con balines y medalla central",
+      "disponibilidad": "Disponible para entrega inmediata"
     },
     {
-      "id": "pulsera-cruz-tejida",
-      "nombre": "Pulsera Tejida Cruz 18k",
+      "id": "pulsera-marine",
+      "nombre": "Pulsera Tejido Marine",
       "categoria": "Pulseras",
-      "precio": "Consultar precio",
-      "estado": "Disponible",
-      "descripcion": "Pulsera tejida a mano con dije de cruz central y balines en Oro Laminado 18k.",
-      "imagen": "img/productos/pulsera-cruz.jpg"
+      "imagen": "img/productos/Pulseras (2).jpg",
+      "descripcion": "Pulsera de eslabón tejido Marine en oro laminado 18K. Un diseño clásico, versátil y sofisticado que aporta distinción y brillo sutil a tu muñeca todos los días.",
+      "material": "Oro laminado 18K (no se oscurece)",
+      "detalle": "Grosor: 1.5 mm • Largo: 19.5 cm",
+      "disponibilidad": "Disponible para entrega inmediata"
     },
     {
-      "id": "anillo-corte-esmeralda",
-      "nombre": "Anillo Solitario Corte Esmeralda",
+      "id": "pulsera-caracol-plana",
+      "nombre": "Pulsera Tejido Caracol Plana",
+      "categoria": "Pulseras",
+      "imagen": "img/productos/Pulseras (3).jpg",
+      "descripcion": "Pulsera en tejido caracol plano elaborada en oro laminado 18K. Sus eslabones delicados ofrecen una caída suave, luminosa y elegante para cualquier ocasión.",
+      "material": "Oro laminado 18K (no se oscurece)",
+      "detalle": "Grosor: 1.80 mm • Largo: 16.5 cm",
+      "disponibilidad": "Disponible para entrega inmediata"
+    },
+    {
+      "id": "anillo-solitario-princesa",
+      "nombre": "Anillo Solitario Corte Cuadrado",
       "categoria": "Anillos",
-      "precio": "Consultar precio",
-      "estado": "Disponible",
-      "descripcion": "Anillo delicado con circonia corte rectangular engastada en Oro Laminado 18k.",
-      "imagen": "img/productos/anillo-esmeralda.jpg"
+      "imagen": "img/productos/Anillo.jpg",
+      "descripcion": "Nuestro anillo solitario es esa joya minimalista que ilumina tu mano sin esfuerzo. Delicado, femenino y atemporal; ideal para uso diario, para compromiso o para recordarte que tú también mereces brillar todos los días.",
+      "material": "Oro laminado 18K (hipoalergénico, no se oscurece)",
+      "detalle": "Circonia central de alto brillo con halo delicado",
+      "disponibilidad": "Disponible para entrega inmediata"
     },
     {
       "id": "anillo-solitario-clasico",
       "nombre": "Anillo Solitario Clásico",
       "categoria": "Anillos",
-      "precio": "Consultar precio",
-      "estado": "Disponible",
-      "descripcion": "Diseño minimalista y elegante con piedra brillante central en Oro Laminado 18k.",
-      "imagen": "img/productos/anillo-solitario.jpg"
+      "imagen": "img/productos/Anillos (3).jpg",
+      "descripcion": "La delicadeza hecha anillo. Un diseño solitario sutil y luminoso en oro laminado 18K que brinda el toque perfecto de elegancia y sofisticación a tu mano.",
+      "material": "Oro laminado 18K (hipoalergénico, no se oscurece)",
+      "detalle": "Circonia redonda central de alto brillo",
+      "disponibilidad": "Disponible para entrega inmediata"
     },
     {
-      "id": "argollas-matrimonio-18k",
-      "nombre": "Argollas Clásicas Borde Diamantado",
-      "categoria": "Argollas",
-      "precio": "Consultar precio",
-      "estado": "Disponible",
-      "descripcion": "Par de argollas con acabado espejo y borde biselado en Oro Laminado 18k.",
-      "imagen": "img/productos/argollas.jpg"
+      "id": "argollas-matrimoniales-clasicas",
+      "nombre": "Argollas Matrimoniales Clásicas",
+      "categoria": "Anillos",
+      "imagen": "img/productos/Anillos (2).jpg",
+      "descripcion": "Un «Sí, acepto» para toda la vida. Porque el amor verdadero no se mide en quilates, sino en los momentos que perduran; nuestras argollas matrimoniales en oro laminado 18K son el símbolo perfecto de su historia.",
+      "material": "Oro laminado 18K (no se oscurece)",
+      "detalle": "Par de argollas con franja texturizada y bordes espejo",
+      "disponibilidad": "Disponible para entrega inmediata"
+    },
+    {
+      "id": "argollas-matrimoniales-talladas",
+      "nombre": "Argollas Matrimoniales Talladas",
+      "categoria": "Anillos",
+      "imagen": "img/productos/Anillos.jpg",
+      "descripcion": "¿Listos para el «Sí» más importante? Nuestras argollas matrimoniales en oro laminado 18K combinan tradición y brillo superior para convertirse en el símbolo de un amor para siempre.",
+      "material": "Oro laminado 18K (no se oscurece)",
+      "detalle": "Par de argollas con grabado tipo espiga diamantado",
+      "disponibilidad": "Disponible para entrega inmediata"
+    },
+    {
+      "id": "dije-oso-macizo",
+      "nombre": "Dije Oso Macizo Mediano",
+      "categoria": "Dijes",
+      "imagen": "img/productos/Dijen.jpg",
+      "descripcion": "Dije estilo Tous macizo en tamaño mediano con acabado espejo en oro laminado 18K. Un detalle tierno, moderno y versátil para lucir en tu cadena favorita.",
+      "material": "Oro laminado 18K (no se oscurece)",
+      "detalle": "Diseño macizo mediano de alto brillo",
+      "disponibilidad": "Disponible para entrega inmediata"
+    },
+    {
+      "id": "dije-cruz-cristo-mini",
+      "nombre": "Dije Cruz Cristo Mini",
+      "categoria": "Dijes",
+      "imagen": "img/productos/Dijen (2).jpg",
+      "descripcion": "Dije de cruz con relieve y terminaciones labradas en oro laminado 18K. Una joya llena de fe, significado y delicadeza para acompañarte en todo momento.",
+      "material": "Oro laminado 18K (no se oscurece)",
+      "detalle": "Tamaño mini: 2.0 cm de alto",
+      "disponibilidad": "Disponible para entrega inmediata"
+    },
+    {
+      "id": "dije-cruz-lisa-mini",
+      "nombre": "Dije Cruz Clásica Mini",
+      "categoria": "Dijes",
+      "imagen": "img/productos/Dijen (3).jpg",
+      "descripcion": "Dije de cruz minimalista con acabado liso y brillante en oro laminado 18K. Sutil, atemporal y perfecto para combinar a diario con cadenas finas.",
+      "material": "Oro laminado 18K (no se oscurece)",
+      "detalle": "Diseño clásico liso en tamaño mini",
+      "disponibilidad": "Disponible para entrega inmediata"
+    },
+    {
+      "id": "dije-ala-angel",
+      "nombre": "Dije Ala de Ángel",
+      "categoria": "Dijes",
+      "imagen": "img/productos/Dijen (4).jpg",
+      "descripcion": "Dije en forma de ala finamente detallada en oro laminado 18K. Un símbolo especial de protección, libertad y luz que resalta con elegancia en tu cuello.",
+      "material": "Oro laminado 18K (no se oscurece)",
+      "detalle": "Relieve de plumaje detallado con pasa-cadena pulido",
+      "disponibilidad": "Disponible para entrega inmediata"
+    },
+    {
+      "id": "aretes-candongas-click",
+      "nombre": "Candongas Click Lisas",
+      "categoria": "Aretes",
+      "imagen": "img/productos/Aretes.jpg",
+      "descripcion": "Candongas circulares de acabado liso y cierre práctico tipo click en oro laminado 18K. Cómodas, ligeras y seguras para brillar todos los días.",
+      "material": "Oro laminado 18K (hipoalergénico, no se oscurece)",
+      "detalle": "Diámetro: 10 mm • Cierre click seguro",
+      "disponibilidad": "Disponible para entrega inmediata"
+    },
+    {
+      "id": "aretes-candongas-canoita",
+      "nombre": "Candongas Canoíta Medianas",
+      "categoria": "Aretes",
+      "imagen": "img/productos/Aretes (2).jpg",
+      "descripcion": "Candongas estilo canoíta en tamaño mediano elaboradas en oro laminado 18K. El accesorio clásico, femenino y luminoso, perfecto para elevar tu look en segundos.",
+      "material": "Oro laminado 18K (hipoalergénico, no se oscurece)",
+      "detalle": "Medida: 1.3 cm (tamaño mediano)",
+      "disponibilidad": "Disponible para entrega inmediata"
+    },
+    {
+      "id": "cadena-caracol-plana",
+      "nombre": "Cadena Tejido Caracol Plana",
+      "categoria": "Cadenas",
+      "imagen": "img/productos/Cadena.jpg",
+      "descripcion": "Cadena en tejido caracol plano elaborada en oro laminado 18K. ¡El regalo perfecto para esta temporada de Amor y Amistad o para consentirte con una joya eterna!",
+      "material": "Oro laminado 18K (no se oscurece)",
+      "detalle": "Largo: 45 cm • Eslabón caracol plano",
+      "disponibilidad": "Disponible para entrega inmediata"
     }
   ]
 }

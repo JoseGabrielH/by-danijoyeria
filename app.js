@@ -1,98 +1,168 @@
 document.getElementById('anio').textContent = new Date().getFullYear();
 
-const grid = document.getElementById('productos-grid');
-const filtroContainer = document.getElementById('categorias-filtro');
+const categoriasGrid = document.getElementById('categorias-grid');
+const categoriaAbiertaView = document.getElementById('categoria-abierta');
+const productosGrid = document.getElementById('productos-grid');
+const categoriasTabs = document.getElementById('categorias-tabs');
+const btnVolverCategorias = document.getElementById('btn-volver-categorias');
+const nombreCategoriaActiva = document.getElementById('nombre-categoria-activa');
+const contadorCategoriaActiva = document.getElementById('contador-categoria-activa');
+const catalogoTitulo = document.getElementById('catalogo-titulo');
+const catalogoSubtexto = document.getElementById('catalogo-subtexto');
 
+let categoriasData = [];
 let todosLosProductos = [];
-let telefonoWhatsApp = '573000000000';
-
-// Imagen elegante de respaldo mientras se suben las fotos reales a img/productos/
-const PLACEHOLDER_IMG =
-  "data:image/svg+xml;utf8," +
-  encodeURIComponent(`
-    <svg xmlns="http://www.w3.org/2000/svg" width="500" height="500" viewBox="0 0 500 500">
-      <rect width="100%" height="100%" fill="#F5F0E6"/>
-      <circle cx="250" cy="220" r="70" fill="none" stroke="#C5A059" stroke-width="3"/>
-      <polygon points="220,195 280,195 295,215 250,260 205,215" fill="none" stroke="#C5A059" stroke-width="3"/>
-      <text x="50%" y="335" text-anchor="middle" font-family="Georgia, serif" font-size="22" fill="#9B7832">BY.DANIJOYERIA</text>
-      <text x="50%" y="362" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" letter-spacing="3" fill="#66625B">ORO LAMINADO 18K</text>
-    </svg>
-  `);
 
 async function cargarCatalogo() {
   try {
     const res = await fetch('data/productos.json');
     const data = await res.json();
 
-    if (data.configuracion && data.configuracion.whatsapp) {
-      telefonoWhatsApp = data.configuracion.whatsapp;
-      actualizarEnlacesWhatsApp(telefonoWhatsApp);
-    }
-
+    categoriasData = data.categorias || [];
     todosLosProductos = data.productos || [];
-    renderizarBotonesCategorias(todosLosProductos);
-    renderizarProductos(todosLosProductos);
+
+    renderizarTarjetasCategorias();
+    renderizarPestanasCategorias();
+    configurarEnlacesFooter();
   } catch (err) {
-    grid.innerHTML = '<p>Próximamente nuevas joyas disponibles.</p>';
+    categoriasGrid.innerHTML = '<p>Error al cargar el catálogo de joyas.</p>';
   }
 }
 
-function actualizarEnlacesWhatsApp(numero) {
-  const waFloat = document.getElementById('wa-float');
-  const footerWa = document.getElementById('footer-wa');
-  const msg = encodeURIComponent('Hola By.danijoyeria, me gustaría recibir asesoría sobre sus joyas en Oro Laminado 18k ✨');
-  if (waFloat) waFloat.href = `https://wa.me/${numero}?text=${msg}`;
-  if (footerWa) footerWa.href = `https://wa.me/${numero}?text=${msg}`;
-}
+// 1. Renderiza las 5 tarjetas de categorías (Imagen de portada + Nombre debajo)
+function renderizarTarjetasCategorias() {
+  categoriasGrid.innerHTML = '';
 
-function renderizarBotonesCategorias(productos) {
-  const categorias = ['Todas', ...new Set(productos.map(p => p.categoria))];
-  filtroContainer.innerHTML = '';
+  categoriasData.forEach(cat => {
+    const cantidad = todosLosProductos.filter(p => p.categoria === cat.id).length;
+    const textoCantidad = cantidad === 1 ? '1 joya disponible' : `${cantidad} joyas disponibles`;
 
-  categorias.forEach((cat, idx) => {
-    const btn = document.createElement('button');
-    btn.className = `pill-btn ${idx === 0 ? 'active' : ''}`;
-    btn.textContent = cat;
-    btn.addEventListener('click', () => {
-      document.querySelectorAll('.pill-btn').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      if (cat === 'Todas') {
-        renderizarProductos(todosLosProductos);
-      } else {
-        renderizarProductos(todosLosProductos.filter(p => p.categoria === cat));
+    const card = document.createElement('article');
+    card.className = 'category-card';
+    card.setAttribute('role', 'button');
+    card.setAttribute('tabindex', '0');
+    card.setAttribute('aria-label', `Ver categoría ${cat.nombre}`);
+
+    card.innerHTML = `
+      <div class="category-img-wrapper">
+        <img src="${encodeURI(cat.imagen)}" alt="Categoría ${cat.nombre}" loading="lazy">
+      </div>
+      <div class="category-card-footer">
+        <h3 class="category-card-title">${cat.nombre}</h3>
+        <span class="category-card-count">${textoCantidad}</span>
+      </div>
+    `;
+
+    card.addEventListener('click', () => abrirCategoria(cat.id));
+    card.addEventListener('keydown', e => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        abrirCategoria(cat.id);
       }
     });
-    filtroContainer.appendChild(btn);
+
+    categoriasGrid.appendChild(card);
   });
 }
 
+// 2. Abre una categoría y muestra los productos que pertenecen a ella
+function abrirCategoria(categoriaId) {
+  const productosFiltrados = todosLosProductos.filter(p => p.categoria === categoriaId);
+  const cantidad = productosFiltrados.length;
+
+  // Ocultar cuadrícula de categorías y mostrar vista de productos de la categoría
+  categoriasGrid.classList.add('hidden');
+  categoriaAbiertaView.classList.remove('hidden');
+
+  catalogoTitulo.textContent = `Colección de ${categoriaId}`;
+  catalogoSubtexto.textContent = 'Oro Laminado 18K • Diseños exclusivos con garantía de brillo';
+
+  nombreCategoriaActiva.textContent = categoriaId;
+  contadorCategoriaActiva.textContent = cantidad === 1 ? '1 Producto' : `${cantidad} Productos`;
+
+  // Marcar pestaña activa
+  document.querySelectorAll('.pill-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.cat === categoriaId);
+  });
+
+  renderizarProductos(productosFiltrados);
+
+  // Desplazar suavemente al inicio de la sección del catálogo
+  document.getElementById('catalogo').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+// 3. Volver a la vista de las 5 categorías principales
+function volverACategorias() {
+  categoriaAbiertaView.classList.add('hidden');
+  categoriasGrid.classList.remove('hidden');
+
+  catalogoTitulo.textContent = 'Categorías de Joyas';
+  catalogoSubtexto.textContent = 'Selecciona una categoría para ver todas sus joyas disponibles';
+
+  document.getElementById('catalogo').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+btnVolverCategorias.addEventListener('click', volverACategorias);
+
+// 4. Pestañas rápidas dentro de la vista abierta para cambiar entre las 5 categorías
+function renderizarPestanasCategorias() {
+  categoriasTabs.innerHTML = '';
+
+  categoriasData.forEach(cat => {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'pill-btn';
+    btn.dataset.cat = cat.id;
+    btn.textContent = cat.nombre;
+    btn.addEventListener('click', () => abrirCategoria(cat.id));
+    categoriasTabs.appendChild(btn);
+  });
+}
+
+// 5. Renderiza las tarjetas de productos con formato simétrico y ortografía cuidada
 function renderizarProductos(lista) {
-  grid.innerHTML = '';
+  productosGrid.innerHTML = '';
 
   lista.forEach(prod => {
-    const mensajeWA = encodeURIComponent(
-      `Hola By.danijoyeria ✨ Me interesa la joya: *${prod.nombre}* (${prod.categoria}). ¿Está disponible?`
-    );
-    const linkWA = `https://wa.me/${telefonoWhatsApp}?text=${mensajeWA}`;
-
     const card = document.createElement('article');
     card.className = 'product-card';
+
     card.innerHTML = `
       <div class="product-img-wrapper">
-        <span class="product-badge">${prod.estado || 'Disponible'}</span>
-        <img src="${prod.imagen}" alt="${prod.nombre}" loading="lazy" onerror="this.onerror=null;this.src='${PLACEHOLDER_IMG}';">
+        <span class="product-badge">Oro Laminado 18K</span>
+        <img src="${encodeURI(prod.imagen)}" alt="${prod.nombre}" loading="lazy">
       </div>
       <div class="product-info">
-        <span class="product-category">${prod.categoria}</span>
-        <h3 class="product-title">${prod.nombre}</h3>
+        <span class="product-category">${prod.categoria} • By.danijoyeria</span>
+        <h4 class="product-title">${prod.nombre}</h4>
         <p class="product-desc">${prod.descripcion}</p>
-        <div class="product-price">${prod.precio}</div>
-        <a href="${linkWA}" target="_blank" rel="noopener" class="btn-buy-wa">
-          Pedir por WhatsApp
-        </a>
+        <ul class="product-specs">
+          <li>
+            <span class="spec-dot">✦</span>
+            <span><strong class="spec-label">Material:</strong> ${prod.material}</span>
+          </li>
+          <li>
+            <span class="spec-dot">✦</span>
+            <span><strong class="spec-label">Detalle:</strong> ${prod.detalle}</span>
+          </li>
+          <li>
+            <span class="spec-dot">✦</span>
+            <span><strong class="spec-label">Estado:</strong> ${prod.disponibilidad}</span>
+          </li>
+        </ul>
       </div>
     `;
-    grid.appendChild(card);
+
+    productosGrid.appendChild(card);
+  });
+}
+
+function configurarEnlacesFooter() {
+  document.querySelectorAll('#footer-categorias a[data-cat]').forEach(link => {
+    link.addEventListener('click', e => {
+      e.preventDefault();
+      abrirCategoria(link.dataset.cat);
+    });
   });
 }
 
