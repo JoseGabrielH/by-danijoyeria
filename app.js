@@ -1,3 +1,15 @@
+// Asegurar que al abrir, recargar o volver a entrar a la página siempre inicie en la parte superior
+if ('scrollRestoration' in history) {
+  history.scrollRestoration = 'manual';
+}
+if (window.location.hash) {
+  history.replaceState(null, '', window.location.pathname + window.location.search);
+}
+window.scrollTo(0, 0);
+window.addEventListener('pageshow', () => {
+  window.scrollTo(0, 0);
+});
+
 document.getElementById('anio').textContent = new Date().getFullYear();
 
 const categoriasGrid = document.getElementById('categorias-grid');
@@ -207,7 +219,7 @@ function renderizarPestanasCategorias() {
 
 // 5. Renderiza las tarjetas de productos con formato simétrico, botones de Carrito/Compra y apertura de Ficha en Grande
 function obtenerEnlaceCompraDirecta(prod) {
-  const mensaje = `Hola By.danijoyeria ✨ Me interesa comprar la joya: *${prod.nombre}* (${prod.categoria} - Oro Laminado 18K). ¿Está disponible?`;
+  const mensaje = `Hola By.danijoyeria. Me interesa comprar la joya: *${prod.nombre}* (${prod.categoria} - Oro Laminado 18K). ¿Está disponible?`;
   const numeroLimpio = (configNegocio.whatsapp || '').replace(/\D/g, '');
   if (numeroLimpio && numeroLimpio !== '573000000000') {
     return `https://wa.me/${numeroLimpio}?text=${encodeURIComponent(mensaje)}`;
@@ -229,7 +241,7 @@ function renderizarProductos(lista) {
       <div class="product-img-wrapper product-clickable" title="Ver ficha completa de ${prod.nombre}">
         <span class="product-badge">Oro Laminado 18K</span>
         <img src="${encodeURI(prod.imagen)}" alt="${prod.nombre}" loading="lazy">
-        <span class="product-zoom-hint">🔍 Ver ficha en grande</span>
+        <span class="product-zoom-hint">Ver ficha en grande</span>
       </div>
       <div class="product-info">
         <div class="product-clickable">
@@ -253,10 +265,10 @@ function renderizarProductos(lista) {
         </ul>
         <div class="product-actions">
           <button type="button" class="btn-add-cart" data-id="${prod.id}">
-            🛍️ Añadir al carrito
+            Añadir al carrito
           </button>
           <a href="${linkCompra}" target="_blank" rel="noopener" class="btn-buy-direct">
-            💬 Comprar
+            Comprar
           </a>
         </div>
       </div>
@@ -341,7 +353,7 @@ function agregarAlCarrito(prod) {
 
   guardarCarrito();
   actualizarVistaCarrito();
-  mostrarNotificacionCarrito(`"${prod.nombre}" añadida al carrito ✨`);
+  mostrarNotificacionCarrito(`"${prod.nombre}" añadida al carrito`);
 }
 
 function cambiarCantidadCarrito(id, delta) {
@@ -412,7 +424,7 @@ function enviarPedidoCarrito() {
   }
 
   const lineas = carrito.map(i => `• ${i.cantidad}x ${i.nombre} (${i.categoria})`).join('\n');
-  const mensaje = `Hola By.danijoyeria ✨ Quiero realizar el siguiente pedido de joyas en Oro Laminado 18K:\n\n${lineas}\n\n¿Me confirmas disponibilidad y precio total?`;
+  const mensaje = `Hola By.danijoyeria. Quiero realizar el siguiente pedido de joyas en Oro Laminado 18K:\n\n${lineas}\n\n¿Me confirmas disponibilidad y precio total?`;
 
   const numeroLimpio = (configNegocio.whatsapp || '').replace(/\D/g, '');
   if (numeroLimpio && numeroLimpio !== '573000000000') {
@@ -498,132 +510,84 @@ function configurarEnlacesFooter() {
   });
 }
 
-// 6. Carrusel de 3 imágenes visibles con desplazamiento simultáneo hacia la izquierda
+// 6. Carrusel continuo y constante hacia la izquierda desde el primer instante
 function iniciarCarrusel() {
   const track = document.getElementById('carrusel-track');
-  const dotsContainer = document.getElementById('carrusel-dots');
   const btnPrev = document.getElementById('carrusel-prev');
   const btnNext = document.getElementById('carrusel-next');
-  const container = document.getElementById('carrusel-container');
 
   if (!track || !carruselData.length) return;
 
-  let animando = false;
-  track.innerHTML = '';
-  dotsContainer.innerHTML = '';
+  if (intervaloCarrusel) {
+    cancelAnimationFrame(intervaloCarrusel);
+    intervaloCarrusel = null;
+  }
 
-  // Crear las tarjetas en la pista horizontal
-  carruselData.forEach((item, index) => {
+  track.innerHTML = '';
+  track.style.transition = 'none';
+
+  // Duplicamos la lista para que el desplazamiento continuo hacia la izquierda sea infinito y sin cortes
+  const listaContinua = [...carruselData, ...carruselData];
+
+  listaContinua.forEach((item, index) => {
     const card = document.createElement('div');
     card.className = 'carousel-card';
-    card.dataset.index = index;
+    card.dataset.index = index % carruselData.length;
     card.innerHTML = `<img src="${encodeURI(item.imagen)}" alt="${item.titulo || 'Joya By.danijoyeria'}">`;
     track.appendChild(card);
-
-    const dot = document.createElement('button');
-    dot.type = 'button';
-    dot.className = 'carousel-dot';
-    dot.setAttribute('aria-label', `Imagen ${index + 1}`);
-    dot.addEventListener('click', () => {
-      if (animando) return;
-      deslizarHaciaIzquierda();
-      reiniciarTemporizadorCarrusel();
-    });
-    dotsContainer.appendChild(dot);
   });
 
-  function obtenerPasoDesplazamiento() {
+  let desplazamientoPx = 0;
+  let ultimoTiempo = performance.now();
+  const velocidadPxPorSegundo = 115; // Velocidad constante y fluida desde el inicio
+
+  function obtenerAnchoPaso() {
     const primeraTarjeta = track.querySelector('.carousel-card');
     if (!primeraTarjeta) return 0;
     const estilosTrack = window.getComputedStyle(track);
-    const gap = parseFloat(estilosTrack.gap || estilosTrack.columnGap || 20);
+    const gap = parseFloat(estilosTrack.gap || estilosTrack.columnGap || 16);
     return primeraTarjeta.getBoundingClientRect().width + gap;
   }
 
-  function actualizarEstadoCentro() {
-    const tarjetas = track.querySelectorAll('.carousel-card');
-    tarjetas.forEach((c, idx) => {
-      c.classList.toggle('is-center', idx === 1);
+  function animarContinuo(tiempoActual) {
+    const deltaSegundos = Math.min((tiempoActual - ultimoTiempo) / 1000, 0.1);
+    ultimoTiempo = tiempoActual;
+
+    const anchoPaso = obtenerAnchoPaso();
+    const anchoCicloCompleto = anchoPaso * carruselData.length;
+
+    if (anchoCicloCompleto > 0) {
+      desplazamientoPx += velocidadPxPorSegundo * deltaSegundos;
+      if (desplazamientoPx >= anchoCicloCompleto) {
+        desplazamientoPx -= anchoCicloCompleto;
+      }
+      track.style.transform = `translate3d(-${desplazamientoPx}px, 0, 0)`;
+    }
+
+    intervaloCarrusel = requestAnimationFrame(animarContinuo);
+  }
+
+  if (btnNext) {
+    btnNext.addEventListener('click', () => {
+      const anchoPaso = obtenerAnchoPaso();
+      const anchoCicloCompleto = anchoPaso * carruselData.length;
+      if (anchoCicloCompleto > 0) {
+        desplazamientoPx = (desplazamientoPx + anchoPaso) % anchoCicloCompleto;
+      }
     });
-
-    const tarjetaCentral = tarjetas[1];
-    const idxActivo = tarjetaCentral ? Number(tarjetaCentral.dataset.index) : 0;
-    const dots = dotsContainer.querySelectorAll('.carousel-dot');
-    dots.forEach((d, idx) => d.classList.toggle('active', idx === idxActivo));
   }
 
-  // Mueve todas las imágenes al mismo tiempo hacia la izquierda
-  function deslizarHaciaIzquierda() {
-    if (animando) return;
-    animando = true;
-
-    const paso = obtenerPasoDesplazamiento();
-    const tarjetas = track.querySelectorAll('.carousel-card');
-    tarjetas.forEach((c, idx) => c.classList.toggle('is-center', idx === 2));
-
-    track.style.transition = 'transform 0.65s cubic-bezier(0.25, 1, 0.5, 1)';
-    track.style.transform = `translate3d(-${paso}px, 0, 0)`;
-
-    const alTerminar = () => {
-      track.removeEventListener('transitionend', alTerminar);
-      track.style.transition = 'none';
-      track.appendChild(track.firstElementChild);
-      track.style.transform = 'translate3d(0, 0, 0)';
-      actualizarEstadoCentro();
-      animando = false;
-    };
-
-    track.addEventListener('transitionend', alTerminar, { once: true });
+  if (btnPrev) {
+    btnPrev.addEventListener('click', () => {
+      const anchoPaso = obtenerAnchoPaso();
+      const anchoCicloCompleto = anchoPaso * carruselData.length;
+      if (anchoCicloCompleto > 0) {
+        desplazamientoPx = (desplazamientoPx - anchoPaso + anchoCicloCompleto) % anchoCicloCompleto;
+      }
+    });
   }
 
-  // Mueve hacia la derecha si el usuario presiona la flecha izquierda
-  function deslizarHaciaDerecha() {
-    if (animando) return;
-    animando = true;
-
-    const paso = obtenerPasoDesplazamiento();
-    track.style.transition = 'none';
-    track.prepend(track.lastElementChild);
-    track.style.transform = `translate3d(-${paso}px, 0, 0)`;
-
-    // Forzar reflujo para que el navegador aplique la posición inicial antes de animar
-    void track.offsetWidth;
-
-    track.style.transition = 'transform 0.65s cubic-bezier(0.25, 1, 0.5, 1)';
-    track.style.transform = 'translate3d(0, 0, 0)';
-    actualizarEstadoCentro();
-
-    const alTerminar = () => {
-      track.removeEventListener('transitionend', alTerminar);
-      track.style.transition = 'none';
-      animando = false;
-    };
-
-    track.addEventListener('transitionend', alTerminar, { once: true });
-  }
-
-  function reiniciarTemporizadorCarrusel() {
-    if (intervaloCarrusel) clearInterval(intervaloCarrusel);
-    intervaloCarrusel = setInterval(deslizarHaciaIzquierda, 3500);
-  }
-
-  btnNext.addEventListener('click', () => {
-    deslizarHaciaIzquierda();
-    reiniciarTemporizadorCarrusel();
-  });
-
-  btnPrev.addEventListener('click', () => {
-    deslizarHaciaDerecha();
-    reiniciarTemporizadorCarrusel();
-  });
-
-  container.addEventListener('mouseenter', () => {
-    if (intervaloCarrusel) clearInterval(intervaloCarrusel);
-  });
-  container.addEventListener('mouseleave', reiniciarTemporizadorCarrusel);
-
-  actualizarEstadoCentro();
-  reiniciarTemporizadorCarrusel();
+  intervaloCarrusel = requestAnimationFrame(animarContinuo);
 }
 
 cargarCatalogo();
