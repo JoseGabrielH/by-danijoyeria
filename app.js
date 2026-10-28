@@ -15,9 +15,78 @@ let todosLosProductos = [];
 let carruselData = [];
 let indiceCarrusel = 0;
 let intervaloCarrusel = null;
+let idAnimacionScroll = null;
+
+// Función de desplazamiento suave (scroll con curva easeInOutCubic) para todos los botones
+function desplazarSuaveHacia(elementoDestino, duracion = 900) {
+  if (!elementoDestino) return;
+
+  if (idAnimacionScroll) {
+    cancelAnimationFrame(idAnimacionScroll);
+  }
+
+  const header = document.querySelector('.header');
+  const altoHeader = header ? header.offsetHeight : 0;
+  const posicionInicial = window.pageYOffset || document.documentElement.scrollTop;
+  const rectDestino = elementoDestino.getBoundingClientRect().top;
+  const posicionFinal = Math.max(0, posicionInicial + rectDestino - altoHeader);
+  const distancia = posicionFinal - posicionInicial;
+
+  if (Math.abs(distancia) < 2) return;
+
+  let tiempoInicio = null;
+
+  function curvaSuave(t) {
+    return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+  }
+
+  function pasoScroll(tiempoActual) {
+    if (tiempoInicio === null) tiempoInicio = tiempoActual;
+    const tiempoTranscurrido = tiempoActual - tiempoInicio;
+    const progreso = Math.min(tiempoTranscurrido / duracion, 1);
+    const avance = curvaSuave(progreso);
+
+    window.scrollTo(0, posicionInicial + distancia * avance);
+
+    if (tiempoTranscurrido < duracion) {
+      idAnimacionScroll = requestAnimationFrame(pasoScroll);
+    } else {
+      idAnimacionScroll = null;
+    }
+  }
+
+  idAnimacionScroll = requestAnimationFrame(pasoScroll);
+}
+
+// Conectar todos los botones de navegación (Inicio, Categorías/Catálogo, Destacados, Nosotros, Garantía 18K, Contacto y Explorar Categorías)
+function configurarScrollSuaveBotones() {
+  const enlacesSecciones = document.querySelectorAll('a[href^="#"]');
+
+  enlacesSecciones.forEach(enlace => {
+    enlace.addEventListener('click', e => {
+      const hash = enlace.getAttribute('href');
+      if (!hash || hash === '#') return;
+
+      const seccionDestino = document.querySelector(hash);
+      if (!seccionDestino) return;
+
+      e.preventDefault();
+
+      // Actualizar estado visual activo en los botones del menú superior
+      if (enlace.closest('.nav-links') || enlace.classList.contains('nav-extra-link')) {
+        document.querySelectorAll('.nav-links a, .nav-extra-link').forEach(a => a.classList.remove('active-nav'));
+        enlace.classList.add('active-nav');
+      }
+
+      desplazarSuaveHacia(seccionDestino, 900);
+    });
+  });
+}
 
 async function cargarCatalogo() {
   try {
+    configurarScrollSuaveBotones();
+
     const res = await fetch('data/productos.json');
     const data = await res.json();
 
@@ -93,7 +162,7 @@ function abrirCategoria(categoriaId) {
   renderizarProductos(productosFiltrados);
 
   // Desplazar suavemente al inicio de la sección del catálogo
-  document.getElementById('catalogo').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  desplazarSuaveHacia(document.getElementById('catalogo'), 850);
 }
 
 // 3. Volver a la vista de las 5 categorías principales
@@ -104,7 +173,7 @@ function volverACategorias() {
   catalogoTitulo.textContent = 'Categorías de Joyas';
   catalogoSubtexto.textContent = 'Selecciona una categoría para ver todas sus joyas disponibles';
 
-  document.getElementById('catalogo').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  desplazarSuaveHacia(document.getElementById('catalogo'), 850);
 }
 
 btnVolverCategorias.addEventListener('click', volverACategorias);

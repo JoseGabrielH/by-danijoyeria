@@ -18,7 +18,8 @@
 }
 
 html {
-  scroll-behavior: smooth;
+  /* El scroll suave lo controla app.js con animación fluida y compensación de menú fijo */
+  scroll-behavior: auto;
 }
 
 body {
