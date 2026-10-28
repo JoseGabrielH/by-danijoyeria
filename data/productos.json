@@ -1,0 +1,54 @@
+{
+  "configuracion": {
+    "whatsapp": "573000000000",
+    "instagram": "_by.danijoyeria",
+    "ciudad": "Magangué, Bolívar"
+  },
+  "productos": [
+    {
+      "id": "pulsera-virgen-balines",
+      "nombre": "Pulsera Tejida Medalla & Balines",
+      "categoria": "Pulseras",
+      "precio": "Consultar precio",
+      "estado": "Disponible",
+      "descripcion": "Pulsera en tejido macramé (negro o rojo) con balines diamantados y medalla en Oro Laminado 18k.",
+      "imagen": "img/productos/pulsera-medalla.jpg"
+    },
+    {
+      "id": "pulsera-cruz-tejida",
+      "nombre": "Pulsera Tejida Cruz 18k",
+      "categoria": "Pulseras",
+      "precio": "Consultar precio",
+      "estado": "Disponible",
+      "descripcion": "Pulsera tejida a mano con dije de cruz central y balines en Oro Laminado 18k.",
+      "imagen": "img/productos/pulsera-cruz.jpg"
+    },
+    {
+      "id": "anillo-corte-esmeralda",
+      "nombre": "Anillo Solitario Corte Esmeralda",
+      "categoria": "Anillos",
+      "precio": "Consultar precio",
+      "estado": "Disponible",
+      "descripcion": "Anillo delicado con circonia corte rectangular engastada en Oro Laminado 18k.",
+      "imagen": "img/productos/anillo-esmeralda.jpg"
+    },
+    {
+      "id": "anillo-solitario-clasico",
+      "nombre": "Anillo Solitario Clásico",
+      "categoria": "Anillos",
+      "precio": "Consultar precio",
+      "estado": "Disponible",
+      "descripcion": "Diseño minimalista y elegante con piedra brillante central en Oro Laminado 18k.",
+      "imagen": "img/productos/anillo-solitario.jpg"
+    },
+    {
+      "id": "argollas-matrimonio-18k",
+      "nombre": "Argollas Clásicas Borde Diamantado",
+      "categoria": "Argollas",
+      "precio": "Consultar precio",
+      "estado": "Disponible",
+      "descripcion": "Par de argollas con acabado espejo y borde biselado en Oro Laminado 18k.",
+      "imagen": "img/productos/argollas.jpg"
+    }
+  ]
+}
