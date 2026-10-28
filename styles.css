@@ -585,20 +585,26 @@ body {
   margin: 0 auto;
 }
 
+.carousel-viewport {
+  width: 100%;
+  overflow: hidden;
+}
+
 .carousel-trio {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  display: flex;
   gap: 20px;
   width: 100%;
   align-items: center;
+  will-change: transform;
 }
 
 .carousel-card {
+  flex: 0 0 calc((100% - 40px) / 3);
   background-color: #F3EFEA;
   border: 1px solid var(--border-soft);
   overflow: hidden;
   aspect-ratio: 3 / 4;
-  transition: transform 0.45s ease, box-shadow 0.45s ease, opacity 0.45s ease;
+  transition: border-color 0.45s ease, box-shadow 0.45s ease;
 }
 
 .carousel-card.is-center {
@@ -611,16 +617,6 @@ body {
   height: 100%;
   object-fit: cover;
   display: block;
-  animation: fadeSlide 0.45s ease;
-}
-
-@keyframes fadeSlide {
-  from {
-    opacity: 0.35;
-  }
-  to {
-    opacity: 1;
-  }
 }
 
 .carousel-arrow {
@@ -862,6 +858,10 @@ body {
 
   .carousel-trio {
     gap: 10px;
+  }
+
+  .carousel-card {
+    flex: 0 0 calc((100% - 20px) / 3);
   }
 
   .category-open-bar {

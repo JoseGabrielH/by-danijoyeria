@@ -171,7 +171,7 @@ function configurarEnlacesFooter() {
   });
 }
 
-// 6. Carrusel de 3 imágenes visibles (Izquierda, Centro, Derecha) debajo de Categorías de Joyas
+// 6. Carrusel de 3 imágenes visibles con desplazamiento simultáneo hacia la izquierda
 function iniciarCarrusel() {
   const track = document.getElementById('carrusel-track');
   const dotsContainer = document.getElementById('carrusel-dots');
@@ -181,72 +181,112 @@ function iniciarCarrusel() {
 
   if (!track || !carruselData.length) return;
 
+  let animando = false;
+  track.innerHTML = '';
   dotsContainer.innerHTML = '';
 
-  carruselData.forEach((_, index) => {
+  // Crear las tarjetas en la pista horizontal
+  carruselData.forEach((item, index) => {
+    const card = document.createElement('div');
+    card.className = 'carousel-card';
+    card.dataset.index = index;
+    card.innerHTML = `<img src="${encodeURI(item.imagen)}" alt="${item.titulo || 'Joya By.danijoyeria'}">`;
+    track.appendChild(card);
+
     const dot = document.createElement('button');
     dot.type = 'button';
-    dot.className = `carousel-dot ${index === 0 ? 'active' : ''}`;
-    dot.setAttribute('aria-label', `Ir a imagen ${index + 1}`);
+    dot.className = 'carousel-dot';
+    dot.setAttribute('aria-label', `Imagen ${index + 1}`);
     dot.addEventListener('click', () => {
-      irASlide(index);
+      if (animando) return;
+      deslizarHaciaIzquierda();
       reiniciarTemporizadorCarrusel();
     });
     dotsContainer.appendChild(dot);
   });
 
-  function renderizarTrio() {
-    const total = carruselData.length;
-    const idxIzq = (indiceCarrusel - 1 + total) % total;
-    const idxCentro = indiceCarrusel % total;
-    const idxDer = (indiceCarrusel + 1) % total;
+  function obtenerPasoDesplazamiento() {
+    const primeraTarjeta = track.querySelector('.carousel-card');
+    if (!primeraTarjeta) return 0;
+    const estilosTrack = window.getComputedStyle(track);
+    const gap = parseFloat(estilosTrack.gap || estilosTrack.columnGap || 20);
+    return primeraTarjeta.getBoundingClientRect().width + gap;
+  }
 
-    const visibles = [
-      { item: carruselData[idxIzq], pos: 'is-side' },
-      { item: carruselData[idxCentro], pos: 'is-center' },
-      { item: carruselData[idxDer], pos: 'is-side' }
-    ];
+  function actualizarEstadoCentro() {
+    const tarjetas = track.querySelectorAll('.carousel-card');
+    tarjetas.forEach((c, idx) => {
+      c.classList.toggle('is-center', idx === 1);
+    });
 
-    track.innerHTML = visibles
-      .map(
-        v => `
-        <div class="carousel-card ${v.pos}">
-          <img src="${encodeURI(v.item.imagen)}" alt="${v.item.titulo || 'Joya By.danijoyeria'}">
-        </div>
-      `
-      )
-      .join('');
-
+    const tarjetaCentral = tarjetas[1];
+    const idxActivo = tarjetaCentral ? Number(tarjetaCentral.dataset.index) : 0;
     const dots = dotsContainer.querySelectorAll('.carousel-dot');
-    dots.forEach((d, idx) => d.classList.toggle('active', idx === idxCentro));
+    dots.forEach((d, idx) => d.classList.toggle('active', idx === idxActivo));
   }
 
-  function irASlide(nuevoIndice) {
-    const total = carruselData.length;
-    indiceCarrusel = (nuevoIndice + total) % total;
-    renderizarTrio();
+  // Mueve todas las imágenes al mismo tiempo hacia la izquierda
+  function deslizarHaciaIzquierda() {
+    if (animando) return;
+    animando = true;
+
+    const paso = obtenerPasoDesplazamiento();
+    const tarjetas = track.querySelectorAll('.carousel-card');
+    tarjetas.forEach((c, idx) => c.classList.toggle('is-center', idx === 2));
+
+    track.style.transition = 'transform 0.65s cubic-bezier(0.25, 1, 0.5, 1)';
+    track.style.transform = `translate3d(-${paso}px, 0, 0)`;
+
+    const alTerminar = () => {
+      track.removeEventListener('transitionend', alTerminar);
+      track.style.transition = 'none';
+      track.appendChild(track.firstElementChild);
+      track.style.transform = 'translate3d(0, 0, 0)';
+      actualizarEstadoCentro();
+      animando = false;
+    };
+
+    track.addEventListener('transitionend', alTerminar, { once: true });
   }
 
-  function siguienteSlide() {
-    irASlide(indiceCarrusel + 1);
-  }
+  // Mueve hacia la derecha si el usuario presiona la flecha izquierda
+  function deslizarHaciaDerecha() {
+    if (animando) return;
+    animando = true;
 
-  function anteriorSlide() {
-    irASlide(indiceCarrusel - 1);
+    const paso = obtenerPasoDesplazamiento();
+    track.style.transition = 'none';
+    track.prepend(track.lastElementChild);
+    track.style.transform = `translate3d(-${paso}px, 0, 0)`;
+
+    // Forzar reflujo para que el navegador aplique la posición inicial antes de animar
+    void track.offsetWidth;
+
+    track.style.transition = 'transform 0.65s cubic-bezier(0.25, 1, 0.5, 1)';
+    track.style.transform = 'translate3d(0, 0, 0)';
+    actualizarEstadoCentro();
+
+    const alTerminar = () => {
+      track.removeEventListener('transitionend', alTerminar);
+      track.style.transition = 'none';
+      animando = false;
+    };
+
+    track.addEventListener('transitionend', alTerminar, { once: true });
   }
 
   function reiniciarTemporizadorCarrusel() {
     if (intervaloCarrusel) clearInterval(intervaloCarrusel);
-    intervaloCarrusel = setInterval(siguienteSlide, 3500);
+    intervaloCarrusel = setInterval(deslizarHaciaIzquierda, 3500);
   }
 
   btnNext.addEventListener('click', () => {
-    siguienteSlide();
+    deslizarHaciaIzquierda();
     reiniciarTemporizadorCarrusel();
   });
 
   btnPrev.addEventListener('click', () => {
-    anteriorSlide();
+    deslizarHaciaDerecha();
     reiniciarTemporizadorCarrusel();
   });
 
@@ -255,7 +295,7 @@ function iniciarCarrusel() {
   });
   container.addEventListener('mouseleave', reiniciarTemporizadorCarrusel);
 
-  renderizarTrio();
+  actualizarEstadoCentro();
   reiniciarTemporizadorCarrusel();
 }
 
