@@ -14,14 +14,16 @@
 </head>
 <body>
 
-  <!-- Barra superior de anuncio -->
-  <div class="top-bar">
-    <p>ORO LAMINADO 18K GARANTIZADO • ENVÍOS DESDE MAGANGUÉ A TODA COLOMBIA</p>
-  </div>
-
-  <!-- Encabezado principal -->
+  <!-- Encabezado principal estilo boutique de gran formato -->
   <header class="header">
     <div class="header-container">
+      <nav class="nav-links nav-left" aria-label="Navegación izquierda">
+        <a href="#inicio" class="active-nav">Inicio</a>
+        <a href="#catalogo">Categorías</a>
+        <a href="#destacados">Destacados</a>
+        <a href="#nosotros">Nosotros</a>
+      </nav>
+
       <a href="#inicio" class="brand">
         <img src="img/logo/SaveClip.App_796460787_18086146505419007_8013437234718514863_n.jpg" alt="By.danijoyeria Logo" class="brand-logo">
         <div class="brand-text">
@@ -30,17 +32,24 @@
         </div>
       </a>
 
-      <nav class="nav-links" aria-label="Navegación principal">
-        <a href="#inicio">Inicio</a>
-        <a href="#catalogo">Categorías</a>
-        <a href="#beneficios">Calidad 18K</a>
-        <a href="#contacto">Contacto</a>
-      </nav>
-
       <div class="header-actions">
+        <a href="#beneficios" class="nav-extra-link">Garantía 18K</a>
+        <a href="#contacto" class="nav-extra-link">Contacto</a>
         <a href="https://www.instagram.com/_by.danijoyeria/" target="_blank" rel="noopener" class="btn-instagram" title="Síguenos en Instagram">
-          Instagram @_by.danijoyeria
+          @_by.danijoyeria
         </a>
+      </div>
+    </div>
+
+    <!-- Cinta continua de frases debajo del menú (estilo alta joyería) -->
+    <div class="top-bar">
+      <div class="top-bar-track">
+        <span>ORO LAMINADO 18K GARANTIZADO</span>
+        <span>BRILLA CON ELEGANCIA</span>
+        <span>JOYAS QUE CUENTAN TU HISTORIA</span>
+        <span>BY.DANIJOYERIA</span>
+        <span>ENVÍOS DESDE MAGANGUÉ A TODA COLOMBIA</span>
+        <span>DETALLES QUE ENAMORAN</span>
       </div>
     </div>
   </header>
@@ -89,9 +98,9 @@
     </div>
 
     <!-- Carrusel de 3 columnas debajo de Categorías de Joyas -->
-    <div class="carousel-wrapper" aria-label="Galería destacada">
+    <div class="carousel-wrapper" id="destacados" aria-label="Galería destacada">
       <div class="carousel-header">
-        <span class="section-subtitle">DESTACADOS EN USO</span>
+        <span class="section-subtitle">"PERFECCIÓN EN CADA DETALLE"</span>
         <h3>Nuestras Joyas en Detalle</h3>
         <div class="gold-divider"></div>
       </div>
