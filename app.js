@@ -12,6 +12,9 @@ const catalogoSubtexto = document.getElementById('catalogo-subtexto');
 
 let categoriasData = [];
 let todosLosProductos = [];
+let carruselData = [];
+let indiceCarrusel = 0;
+let intervaloCarrusel = null;
 
 async function cargarCatalogo() {
   try {
@@ -20,9 +23,11 @@ async function cargarCatalogo() {
 
     categoriasData = data.categorias || [];
     todosLosProductos = data.productos || [];
+    carruselData = data.carrusel || [];
 
     renderizarTarjetasCategorias();
     renderizarPestanasCategorias();
+    iniciarCarrusel();
     configurarEnlacesFooter();
   } catch (err) {
     categoriasGrid.innerHTML = '<p>Error al cargar el catálogo de joyas.</p>';
@@ -164,6 +169,79 @@ function configurarEnlacesFooter() {
       abrirCategoria(link.dataset.cat);
     });
   });
+}
+
+// 6. Carrusel automático de imágenes debajo de Categorías de Joyas
+function iniciarCarrusel() {
+  const track = document.getElementById('carrusel-track');
+  const dotsContainer = document.getElementById('carrusel-dots');
+  const btnPrev = document.getElementById('carrusel-prev');
+  const btnNext = document.getElementById('carrusel-next');
+  const container = document.getElementById('carrusel-container');
+
+  if (!track || !carruselData.length) return;
+
+  track.innerHTML = '';
+  dotsContainer.innerHTML = '';
+
+  carruselData.forEach((item, index) => {
+    const slide = document.createElement('div');
+    slide.className = `carousel-slide ${index === 0 ? 'active' : ''}`;
+    slide.innerHTML = `<img src="${encodeURI(item.imagen)}" alt="${item.titulo || 'Joya By.danijoyeria'}" loading="lazy">`;
+    track.appendChild(slide);
+
+    const dot = document.createElement('button');
+    dot.type = 'button';
+    dot.className = `carousel-dot ${index === 0 ? 'active' : ''}`;
+    dot.setAttribute('aria-label', `Ver imagen ${index + 1}`);
+    dot.addEventListener('click', () => {
+      irASlide(index);
+      reiniciarTemporizadorCarrusel();
+    });
+    dotsContainer.appendChild(dot);
+  });
+
+  function irASlide(nuevoIndice) {
+    const slides = track.querySelectorAll('.carousel-slide');
+    const dots = dotsContainer.querySelectorAll('.carousel-dot');
+    if (!slides.length) return;
+
+    indiceCarrusel = (nuevoIndice + slides.length) % slides.length;
+
+    slides.forEach((s, idx) => s.classList.toggle('active', idx === indiceCarrusel));
+    dots.forEach((d, idx) => d.classList.toggle('active', idx === indiceCarrusel));
+  }
+
+  function siguienteSlide() {
+    irASlide(indiceCarrusel + 1);
+  }
+
+  function anteriorSlide() {
+    irASlide(indiceCarrusel - 1);
+  }
+
+  function reiniciarTemporizadorCarrusel() {
+    if (intervaloCarrusel) clearInterval(intervaloCarrusel);
+    intervaloCarrusel = setInterval(siguienteSlide, 3500);
+  }
+
+  btnNext.addEventListener('click', () => {
+    siguienteSlide();
+    reiniciarTemporizadorCarrusel();
+  });
+
+  btnPrev.addEventListener('click', () => {
+    anteriorSlide();
+    reiniciarTemporizadorCarrusel();
+  });
+
+  // Pausar mientras el usuario pasa el cursor por encima y reanudar al salir
+  container.addEventListener('mouseenter', () => {
+    if (intervaloCarrusel) clearInterval(intervaloCarrusel);
+  });
+  container.addEventListener('mouseleave', reiniciarTemporizadorCarrusel);
+
+  reiniciarTemporizadorCarrusel();
 }
 
 cargarCatalogo();

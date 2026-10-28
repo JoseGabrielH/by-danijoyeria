@@ -4,6 +4,24 @@
     "instagram": "_by.danijoyeria",
     "ciudad": "Magangué, Bolívar"
   },
+  "carrusel": [
+    {
+      "imagen": "img/productos/Carruzel/808547361_18089763506419007_4163952476814162114_n.jpg",
+      "titulo": "Pulsera Marine • Oro Laminado 18K"
+    },
+    {
+      "imagen": "img/productos/Carruzel/819470245_18089763554419007_8293659738547460743_n.jpg",
+      "titulo": "Pulsera Caracol • Oro Laminado 18K"
+    },
+    {
+      "imagen": "img/productos/Carruzel/videoframe_2266.png",
+      "titulo": "Set Cadena + Dije • Oro Laminado 18K"
+    },
+    {
+      "imagen": "img/productos/Carruzel/videoframe_8729.png",
+      "titulo": "Set Bendición • Oro Laminado 18K"
+    }
+  ],
   "categorias": [
     {
       "id": "Pulseras",
