@@ -186,7 +186,7 @@
       <div class="footer-col">
         <h4>Síguenos</h4>
         <p>Conoce nuestras novedades y solicita asesoría:</p>
-        <a href="https://www.instagram.com/__by.danijoyeria?cplk=ZDNlZDc0MzIxNw==" target="_blank" rel="noopener" class="footer-link">Instagram: @__by.danijoyeria</a>
+        <a href="https://ig.me/m/__by.danijoyeria" target="_blank" rel="noopener" class="footer-link" id="footer-instagram">Instagram: @__by.danijoyeria</a>
       </div>
     </div>
     <div class="footer-bottom">
@@ -213,9 +213,9 @@
             <button type="button" id="modal-btn-carrito" class="btn-add-cart">
               Añadir al carrito
             </button>
-            <a id="modal-btn-comprar" href="#" target="_blank" rel="noopener" class="btn-buy-direct">
+            <button type="button" id="modal-btn-comprar" class="btn-buy-direct">
               Comprar
-            </a>
+            </button>
           </div>
         </div>
       </div>
@@ -243,6 +243,30 @@
 
   <!-- Notificación flotante al agregar al carrito -->
   <div id="toast-carrito" class="cart-toast hidden">Joya añadida al carrito</div>
+
+  <!-- Selector de canal para comprar: WhatsApp o Instagram -->
+  <div id="selector-canal" class="channel-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="selector-canal-titulo">
+    <div class="channel-card">
+      <button type="button" class="product-modal-close" id="btn-cerrar-selector" aria-label="Cerrar">&times;</button>
+      <span class="section-subtitle">FINALIZA TU COMPRA</span>
+      <h3 id="selector-canal-titulo">¿Por dónde quieres escribirnos?</h3>
+      <div class="gold-divider"></div>
+      <p class="channel-help">Te enviaremos al chat con un mensaje listo con la referencia de tu joya.</p>
+      <div class="channel-options">
+        <a id="canal-btn-whatsapp" href="#" target="_blank" rel="noopener" class="channel-btn channel-whatsapp">WhatsApp</a>
+        <button type="button" id="canal-btn-instagram" class="channel-btn channel-instagram">Instagram</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Visor en grande de las imágenes del carrusel -->
+  <div id="visor-carrusel" class="carousel-viewer-overlay hidden" role="dialog" aria-modal="true">
+    <div class="carousel-viewer-card">
+      <button type="button" class="product-modal-close" id="btn-cerrar-visor" aria-label="Cerrar">&times;</button>
+      <img id="visor-carrusel-img" src="" alt="">
+      <a id="visor-btn-interesa" href="#" target="_blank" rel="noopener" class="btn-buy-direct viewer-btn">Me interesa</a>
+    </div>
+  </div>
 
   <script src="app.js"></script>
 </body>

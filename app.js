@@ -121,6 +121,7 @@ async function cargarCatalogo() {
     iniciarCarrusel();
     configurarEnlacesFooter();
     configurarModalYCarrito();
+    configurarCanalesContacto();
     actualizarVistaCarrito();
   } catch (err) {
     categoriasGrid.innerHTML = '<p>Error al cargar el catálogo de joyas.</p>';
@@ -218,24 +219,12 @@ function renderizarPestanasCategorias() {
 }
 
 // 5. Renderiza las tarjetas de productos con formato simétrico, botones de Carrito/Compra y apertura de Ficha en Grande
-function obtenerEnlaceCompraDirecta(prod) {
-  const mensaje = `Hola By.danijoyeria. Me interesa comprar la joya: *${prod.nombre}* (${prod.categoria} - Oro Laminado 18K). ¿Está disponible?`;
-  const numeroLimpio = (configNegocio.whatsapp || '').replace(/\D/g, '');
-  if (numeroLimpio && numeroLimpio !== '573000000000') {
-    return `https://wa.me/${numeroLimpio}?text=${encodeURIComponent(mensaje)}`;
-  }
-  // Si aún no hay WhatsApp, lleva directo al chat de mensajes (DM) de Instagram de @__by.danijoyeria
-  return `https://ig.me/m/${configNegocio.instagram || '__by.danijoyeria'}`;
-}
-
 function renderizarProductos(lista) {
   productosGrid.innerHTML = '';
 
   lista.forEach(prod => {
     const card = document.createElement('article');
     card.className = 'product-card';
-
-    const linkCompra = obtenerEnlaceCompraDirecta(prod);
 
     card.innerHTML = `
       <div class="product-img-wrapper product-clickable" title="Ver ficha completa de ${prod.nombre}">
@@ -267,9 +256,9 @@ function renderizarProductos(lista) {
           <button type="button" class="btn-add-cart" data-id="${prod.id}">
             Añadir al carrito
           </button>
-          <a href="${linkCompra}" target="_blank" rel="noopener" class="btn-buy-direct">
+          <button type="button" class="btn-buy-direct">
             Comprar
-          </a>
+          </button>
         </div>
       </div>
     `;
@@ -277,6 +266,12 @@ function renderizarProductos(lista) {
     // Al hacer clic en la imagen o descripción, se abre la Ficha en Grande de la joya
     card.querySelectorAll('.product-clickable').forEach(el => {
       el.addEventListener('click', () => abrirModalJoya(prod));
+    });
+
+    // Botón Comprar: elegir WhatsApp o Instagram con mensaje de la joya
+    card.querySelector('.btn-buy-direct').addEventListener('click', e => {
+      e.stopPropagation();
+      abrirSelectorCanal(mensajeCompraJoya(prod));
     });
 
     // Botón de Añadir al Carrito
@@ -322,7 +317,7 @@ function abrirModalJoya(prod) {
     </li>
   `;
 
-  btnComprar.href = obtenerEnlaceCompraDirecta(prod);
+  btnComprar.onclick = () => abrirSelectorCanal(mensajeCompraJoya(prod));
   btnCarrito.onclick = () => agregarAlCarrito(prod);
 
   modal.classList.remove('hidden');
@@ -426,17 +421,7 @@ function enviarPedidoCarrito() {
   const lineas = carrito.map(i => `• ${i.cantidad}x ${i.nombre} (${i.categoria})`).join('\n');
   const mensaje = `Hola By.danijoyeria. Quiero realizar el siguiente pedido de joyas en Oro Laminado 18K:\n\n${lineas}\n\n¿Me confirmas disponibilidad y precio total?`;
 
-  const numeroLimpio = (configNegocio.whatsapp || '').replace(/\D/g, '');
-  if (numeroLimpio && numeroLimpio !== '573000000000') {
-    window.open(`https://wa.me/${numeroLimpio}?text=${encodeURIComponent(mensaje)}`, '_blank', 'noopener');
-    return;
-  }
-
-  // Mientras no haya WhatsApp, copiamos el pedido al portapapeles y abrimos el chat directo de Instagram de @__by.danijoyeria
-  if (navigator.clipboard && navigator.clipboard.writeText) {
-    navigator.clipboard.writeText(mensaje).catch(() => {});
-  }
-  window.open(`https://ig.me/m/${configNegocio.instagram || '__by.danijoyeria'}`, '_blank', 'noopener');
+  abrirSelectorCanal(mensaje);
 }
 
 function mostrarNotificacionCarrito(texto) {
@@ -510,84 +495,215 @@ function configurarEnlacesFooter() {
   });
 }
 
-// 6. Carrusel continuo y constante hacia la izquierda desde el primer instante
+// 6. Carrusel paso a paso hacia la izquierda (una imagen por vez, transición rápida)
 function iniciarCarrusel() {
   const track = document.getElementById('carrusel-track');
   const btnPrev = document.getElementById('carrusel-prev');
   const btnNext = document.getElementById('carrusel-next');
+  const container = document.getElementById('carrusel-container');
 
   if (!track || !carruselData.length) return;
 
-  if (intervaloCarrusel) {
-    cancelAnimationFrame(intervaloCarrusel);
-    intervaloCarrusel = null;
-  }
+  const DURACION_TRANSICION = 450; // ms que tarda en deslizarse
+  const PAUSA_ENTRE_PASOS = 2200; // ms que se queda quieta cada imagen
+  let animando = false;
+  let pausado = false;
 
   track.innerHTML = '';
   track.style.transition = 'none';
+  track.style.transform = 'translate3d(0, 0, 0)';
 
-  // Duplicamos la lista para que el desplazamiento continuo hacia la izquierda sea infinito y sin cortes
-  const listaContinua = [...carruselData, ...carruselData];
-
-  listaContinua.forEach((item, index) => {
+  carruselData.forEach((item, index) => {
     const card = document.createElement('div');
     card.className = 'carousel-card';
-    card.dataset.index = index % carruselData.length;
+    card.dataset.index = index;
     card.innerHTML = `<img src="${encodeURI(item.imagen)}" alt="${item.titulo || 'Joya By.danijoyeria'}">`;
     track.appendChild(card);
   });
 
-  let desplazamientoPx = 0;
-  let ultimoTiempo = performance.now();
-  const velocidadPxPorSegundo = 115; // Velocidad constante y fluida desde el inicio
+  // Clic en una imagen del carrusel: se abre en grande con el botón "Me interesa"
+  track.addEventListener('click', e => {
+    const card = e.target.closest('.carousel-card');
+    if (!card) return;
+    const item = carruselData[Number(card.dataset.index)];
+    if (item) abrirVisorCarrusel(item);
+  });
 
-  function obtenerAnchoPaso() {
-    const primeraTarjeta = track.querySelector('.carousel-card');
-    if (!primeraTarjeta) return 0;
-    const estilosTrack = window.getComputedStyle(track);
-    const gap = parseFloat(estilosTrack.gap || estilosTrack.columnGap || 16);
-    return primeraTarjeta.getBoundingClientRect().width + gap;
+  function obtenerPaso() {
+    const primera = track.querySelector('.carousel-card');
+    if (!primera) return 0;
+    const estilos = window.getComputedStyle(track);
+    const gap = parseFloat(estilos.columnGap || estilos.gap || 16) || 16;
+    return primera.getBoundingClientRect().width + gap;
   }
 
-  function animarContinuo(tiempoActual) {
-    const deltaSegundos = Math.min((tiempoActual - ultimoTiempo) / 1000, 0.1);
-    ultimoTiempo = tiempoActual;
+  function siguiente() {
+    if (animando) return;
+    animando = true;
+    const paso = obtenerPaso();
+    track.style.transition = `transform ${DURACION_TRANSICION}ms ease-in-out`;
+    track.style.transform = `translate3d(-${paso}px, 0, 0)`;
+    setTimeout(() => {
+      track.style.transition = 'none';
+      track.appendChild(track.firstElementChild);
+      track.style.transform = 'translate3d(0, 0, 0)';
+      animando = false;
+    }, DURACION_TRANSICION);
+  }
 
-    const anchoPaso = obtenerAnchoPaso();
-    const anchoCicloCompleto = anchoPaso * carruselData.length;
+  function anterior() {
+    if (animando) return;
+    animando = true;
+    const paso = obtenerPaso();
+    track.style.transition = 'none';
+    track.prepend(track.lastElementChild);
+    track.style.transform = `translate3d(-${paso}px, 0, 0)`;
+    void track.offsetWidth;
+    track.style.transition = `transform ${DURACION_TRANSICION}ms ease-in-out`;
+    track.style.transform = 'translate3d(0, 0, 0)';
+    setTimeout(() => {
+      track.style.transition = 'none';
+      animando = false;
+    }, DURACION_TRANSICION);
+  }
 
-    if (anchoCicloCompleto > 0) {
-      desplazamientoPx += velocidadPxPorSegundo * deltaSegundos;
-      if (desplazamientoPx >= anchoCicloCompleto) {
-        desplazamientoPx -= anchoCicloCompleto;
-      }
-      track.style.transform = `translate3d(-${desplazamientoPx}px, 0, 0)`;
+  function reiniciarTemporizador() {
+    if (intervaloCarrusel) clearInterval(intervaloCarrusel);
+    intervaloCarrusel = setInterval(() => {
+      if (!pausado) siguiente();
+    }, PAUSA_ENTRE_PASOS + DURACION_TRANSICION);
+  }
+
+  if (btnNext) btnNext.addEventListener('click', () => { siguiente(); reiniciarTemporizador(); });
+  if (btnPrev) btnPrev.addEventListener('click', () => { anterior(); reiniciarTemporizador(); });
+
+  if (container) {
+    container.addEventListener('mouseenter', () => { pausado = true; });
+    container.addEventListener('mouseleave', () => { pausado = false; });
+  }
+
+  // Primer movimiento casi inmediato al entrar a la página
+  setTimeout(siguiente, 1200);
+  reiniciarTemporizador();
+}
+
+// 8. Visor en grande de las imágenes del carrusel con botón "Me interesa"
+function obtenerUrlAbsoluta(rutaRelativa) {
+  return new URL(encodeURI(rutaRelativa), window.location.href).href;
+}
+
+function abrirVisorCarrusel(item) {
+  const visor = document.getElementById('visor-carrusel');
+  const img = document.getElementById('visor-carrusel-img');
+  const btn = document.getElementById('visor-btn-interesa');
+  if (!visor || !img || !btn) return;
+
+  img.src = encodeURI(item.imagen);
+  img.alt = item.titulo || 'Joya By.danijoyeria';
+
+  const mensaje = `Hola By.danijoyeria, me interesa esta: ${item.titulo || ''}\n${obtenerUrlAbsoluta(item.imagen)}`;
+  btn.href = enlaceWhatsApp(mensaje);
+
+  visor.classList.remove('hidden');
+  document.body.style.overflow = 'hidden';
+}
+
+function cerrarVisorCarrusel() {
+  const visor = document.getElementById('visor-carrusel');
+  if (visor) visor.classList.add('hidden');
+  document.body.style.overflow = '';
+}
+
+// 9. Selector de canal (WhatsApp o Instagram) con mensaje automático
+function enlaceWhatsApp(mensaje) {
+  const numero = (configNegocio.whatsapp || '').replace(/\D/g, '');
+  return `https://wa.me/${numero}?text=${encodeURIComponent(mensaje)}`;
+}
+
+function enlaceInstagramDM() {
+  return `https://ig.me/m/${configNegocio.instagram || '__by.danijoyeria'}`;
+}
+
+function copiarAlPortapapeles(texto) {
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    return navigator.clipboard.writeText(texto).catch(() => {});
+  }
+  return Promise.resolve();
+}
+
+// Abre Instagram DM; como Instagram no permite mensajes pre-escritos por enlace, se copia el texto para pegarlo
+function abrirInstagramConMensaje(mensaje) {
+  copiarAlPortapapeles(mensaje);
+  window.open(enlaceInstagramDM(), '_blank', 'noopener');
+  mostrarNotificacionCarrito('Mensaje copiado. Pégalo en el chat de Instagram');
+}
+
+let mensajeCanalPendiente = '';
+
+function abrirSelectorCanal(mensaje) {
+  mensajeCanalPendiente = mensaje;
+  const selector = document.getElementById('selector-canal');
+  const btnWa = document.getElementById('canal-btn-whatsapp');
+  if (!selector || !btnWa) return;
+  btnWa.href = enlaceWhatsApp(mensaje);
+  selector.classList.remove('hidden');
+}
+
+function cerrarSelectorCanal() {
+  const selector = document.getElementById('selector-canal');
+  if (selector) selector.classList.add('hidden');
+}
+
+function mensajeCompraJoya(prod) {
+  return `Hola By.danijoyeria, me interesa comprar esta joya:\n\nReferencia: ${prod.nombre}\nCategoría: ${prod.categoria}\nDetalle: ${prod.detalle}\n\n${obtenerUrlAbsoluta(prod.imagen)}\n\n¿Está disponible?`;
+}
+
+function configurarCanalesContacto() {
+  // Selector de canal
+  const selector = document.getElementById('selector-canal');
+  const btnIg = document.getElementById('canal-btn-instagram');
+  const btnWa = document.getElementById('canal-btn-whatsapp');
+  const btnCerrarSelector = document.getElementById('btn-cerrar-selector');
+
+  if (btnIg) {
+    btnIg.addEventListener('click', () => {
+      abrirInstagramConMensaje(mensajeCanalPendiente);
+      cerrarSelectorCanal();
+    });
+  }
+  if (btnWa) btnWa.addEventListener('click', () => setTimeout(cerrarSelectorCanal, 200));
+  if (btnCerrarSelector) btnCerrarSelector.addEventListener('click', cerrarSelectorCanal);
+  if (selector) {
+    selector.addEventListener('click', e => {
+      if (e.target === selector) cerrarSelectorCanal();
+    });
+  }
+
+  // Visor del carrusel
+  const visor = document.getElementById('visor-carrusel');
+  const btnCerrarVisor = document.getElementById('btn-cerrar-visor');
+  if (btnCerrarVisor) btnCerrarVisor.addEventListener('click', cerrarVisorCarrusel);
+  if (visor) {
+    visor.addEventListener('click', e => {
+      if (e.target === visor) cerrarVisorCarrusel();
+    });
+  }
+
+  // Instagram del pie de página (Síguenos) -> chat con mensaje automático
+  const igFooter = document.getElementById('footer-instagram');
+  if (igFooter) {
+    igFooter.addEventListener('click', e => {
+      e.preventDefault();
+      abrirInstagramConMensaje('Me interesa saber de tu joyería');
+    });
+  }
+
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') {
+      cerrarSelectorCanal();
+      cerrarVisorCarrusel();
     }
-
-    intervaloCarrusel = requestAnimationFrame(animarContinuo);
-  }
-
-  if (btnNext) {
-    btnNext.addEventListener('click', () => {
-      const anchoPaso = obtenerAnchoPaso();
-      const anchoCicloCompleto = anchoPaso * carruselData.length;
-      if (anchoCicloCompleto > 0) {
-        desplazamientoPx = (desplazamientoPx + anchoPaso) % anchoCicloCompleto;
-      }
-    });
-  }
-
-  if (btnPrev) {
-    btnPrev.addEventListener('click', () => {
-      const anchoPaso = obtenerAnchoPaso();
-      const anchoCicloCompleto = anchoPaso * carruselData.length;
-      if (anchoCicloCompleto > 0) {
-        desplazamientoPx = (desplazamientoPx - anchoPaso + anchoCicloCompleto) % anchoCicloCompleto;
-      }
-    });
-  }
-
-  intervaloCarrusel = requestAnimationFrame(animarContinuo);
+  });
 }
 
 cargarCatalogo();
